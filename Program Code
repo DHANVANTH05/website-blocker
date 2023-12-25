@@ -1,0 +1,49 @@
+import tkinter as tk
+from tkinter import Label, Text, Button
+import platform
+
+class WebsiteBlockerApp:
+    def __init__(self, master):
+        self.master = master
+        master.title("Website Blocker")
+
+        self.label = Label(master, text="Enter Website URL:", foreground="blue")
+        self.label.pack()
+
+        self.website_entry = Text(master, height=5, width=50)
+        self.website_entry.pack()
+
+        self.block_button = Button(master, text="Click to Block", command=self.block_website, foreground="yellow", background="green")
+        self.block_button.pack()
+
+    def block_website(self):
+        website = self.website_entry.get("1.0", tk.END).strip()
+        if website:
+            platform_name = platform.system().lower()
+            host_path = ""
+
+            if platform_name == "windows":
+                host_path = r"C:\Windows\System32\drivers\etc\hosts"
+            elif platform_name == "linux":
+                host_path = "/etc/hosts"
+
+            ip_address = "127.0.0.1"
+            website_entry = f"{ip_address} {website}"
+
+            try:
+                with open(host_path, "a") as host_file:
+                    host_file.write("\n" + website_entry)
+                self.show_message(f"Website '{website}' blocked successfully!")
+            except PermissionError:
+                self.show_message("Permission denied. Run the script as administrator.")
+        else:
+            self.show_message("Please enter a website URL.")
+
+    def show_message(self, message):
+        message_label = Label(self.master, text=message, foreground="red")
+        message_label.pack()
+
+if __name__ == "__main__":
+    root = tk.Tk()
+    app = WebsiteBlockerApp(root)
+    root.mainloop()
